@@ -16,6 +16,9 @@ IV). Sigue los pasos en orden; cada paso indica qué deberías ver.
    estado (por ejemplo, "2 en Borrador, 1 Enviado"), y cuatro accesos
    claramente identificables: Presupuestos, Clientes, Catálogo y Perfil.
    *(FR-002, FR-003, US1-AS1)*
+4. Con un cronómetro, comprueba que identificar los cuatro accesos (sin
+   leer instrucciones ni pedir ayuda) te lleva menos de 5 segundos.
+   *(SC-001)*
 
 ## 1. Primera vez, sin datos
 
@@ -63,6 +66,13 @@ IV). Sigue los pasos en orden; cada paso indica qué deberías ver.
    Rechazado o Caducado) — esto es esperado: esos tres estados solo forman
    parte del lenguaje visual, no de los datos, en el alcance de esta
    funcionalidad. *(Clarifications, Edge Case)*
+4. Nota sobre SC-005: el "100% de los casos observados" se comprueba con
+   datos reales solo para Borrador y Enviado (los únicos alcanzables). Para
+   Aceptado, Rechazado y Caducado, comprueba en su lugar que la definición
+   de color/etiqueta existe en `frontend/src/styles/base.css`
+   (`.estado--aceptado`, `.estado--rechazado`, `.estado--caducado`) tal
+   como fija `contracts/sistema-visual-contract.md`, ya que no se pueden
+   generar con datos reales en el alcance de esta funcionalidad.
 
 ## 5. Apariencia general y PDF
 

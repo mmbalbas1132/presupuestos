@@ -66,6 +66,7 @@ Como freelancer que envía presupuestos a sus clientes, quiero que tanto la apli
 
 - ¿Qué ve la freelancer en la página de inicio si alguna de las secciones no puede cargar sus datos (por ejemplo, fallo de red al pedir el resumen de actividad)? El resumen debe degradar con un aviso claro sin bloquear el acceso a las cuatro secciones.
 - ¿Qué ocurre si la freelancer entra directamente a una URL de una sección concreta en vez de por la página de inicio? La navegación común debe aparecer igualmente y marcar esa sección como activa.
+- ¿Qué sección se marca como activa si la freelancer entra directamente a la pantalla de creación/edición de un presupuesto (que no tiene entrada propia en la navegación común)? La navegación común debe resaltar "Presupuestos", ya que esa pantalla forma parte de esa sección (ver `contracts/navegacion-contract.md`).
 - ¿Cómo se distingue visualmente un presupuesto en un estado que hoy la aplicación aún no puede asignar (Aceptado, Rechazado, Caducado) de los estados que sí existen actualmente (Borrador, Enviado)? El lenguaje visual debe estar definido para los cinco, aunque solo dos sean alcanzables con los datos actuales.
 - En el PDF, cuando el texto de una descripción de línea es muy largo, el rediseño no debe romper la maquetación existente ni provocar solapamientos.
 
