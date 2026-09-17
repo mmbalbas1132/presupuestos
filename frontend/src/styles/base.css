@@ -175,6 +175,10 @@ td {
   padding: var(--espacio);
 }
 
+.nav[hidden] {
+  display: none;
+}
+
 .nav {
   display: flex;
   flex-wrap: wrap;

@@ -1,16 +1,22 @@
+let redirigiendo = false;
+
 function redirigirAAcceso() {
+  // Recarga completa (no solo un cambio de hash): así se descartan las
+  // peticiones ya en curso de la pantalla anterior, que de otro modo
+  // podrían resolverse después y sobreescribir la pantalla de acceso
+  // (condición de carrera).
+  if (redirigiendo || window.location.hash === '#/acceso') return;
+  redirigiendo = true;
+
   const rutaActual = window.location.hash.replace(/^#/, '') || '/inicio';
-  if (rutaActual !== '/acceso') {
-    try {
-      sessionStorage.setItem('rutaTrasAcceso', rutaActual);
-    } catch {
-      // Almacenamiento no disponible (p. ej. navegación privada); se ignora,
-      // tras acceder se volverá a la pantalla de inicio.
-    }
+  try {
+    sessionStorage.setItem('rutaTrasAcceso', rutaActual);
+  } catch {
+    // Almacenamiento no disponible (p. ej. navegación privada); se ignora,
+    // tras acceder se volverá a la pantalla de inicio.
   }
-  if (window.location.hash !== '#/acceso') {
-    window.location.hash = '#/acceso';
-  }
+  window.location.hash = '#/acceso';
+  window.location.reload();
 }
 
 async function parseRespuesta(respuesta, ruta) {
