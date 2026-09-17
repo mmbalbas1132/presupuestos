@@ -18,108 +18,151 @@ seguridad.
       ha caducado o es inválida en el servidor en el momento en que la
       freelancer pulsa "Cerrar sesión" (por ejemplo, tras haber estado
       inactiva)? [Gap]
-- [ ] CHK002 - ¿Especifica la spec si el cierre de sesión voluntario debe
+- [X] CHK002 - ¿Especifica la spec si el cierre de sesión voluntario debe
       quedar reflejado en el registro de auditoría (`security.log`,
       decisión [004] de `CLAUDE.md`), o si eso queda explícitamente fuera
-      de alcance? [Gap]
-- [ ] CHK003 - ¿Están definidos los requisitos de seguridad para el texto
+      de alcance? [Gap] → Resuelto: `spec.md` Assumptions, nueva línea
+      "El cierre de sesión voluntario no se registra en el fichero de
+      auditoría...".
+- [X] CHK003 - ¿Están definidos los requisitos de seguridad para el texto
       del aviso no bloqueante que se muestra cuando `cerrarSesion()` falla
       (por ejemplo, que no debe incluir detalles técnicos del error del
-      servidor)? [Gap, Spec §FR-004]
-- [ ] CHK004 - ¿Se documenta qué pasa si dos pestañas del navegador tienen
+      servidor)? [Gap, Spec §FR-004] → Resuelto: `spec.md` Assumptions,
+      nueva línea "El aviso no bloqueante... usa siempre un texto genérico
+      fijo, sin incluir el mensaje de error técnico...".
+- [X] CHK004 - ¿Se documenta qué pasa si dos pestañas del navegador tienen
       sesión iniciada simultáneamente y se cierra sesión desde una de
-      ellas? [Gap]
+      ellas? [Gap] → Resuelto: `spec.md` Assumptions, nueva línea "Esta
+      feature no sincroniza el cierre de sesión entre varias pestañas...".
 
 ## Requirement Clarity
 
-- [ ] CHK005 - ¿Está cuantificado o acotado el término "aviso no
+- [X] CHK005 - ¿Está cuantificado o acotado el término "aviso no
       bloqueante" (por ejemplo, si desaparece solo, tras cuánto tiempo, o
       si requiere una acción explícita para descartarlo)? [Clarity, Spec
-      §Assumptions]
-- [ ] CHK006 - ¿Queda claro, sin ambigüedad, el alcance de "limpiar
+      §Assumptions] → Resuelto: no requiere temporizador; se define por
+      comportamiento ("transitorio o descartable, no impide continuar
+      usando la pantalla de acceso"), suficiente para el tamaño de esta
+      feature.
+- [X] CHK006 - ¿Queda claro, sin ambigüedad, el alcance de "limpiar
       cualquier estado local relacionado con la sesión" (FR-003, FR-004)
       más allá de lo que ya aclara la sección de Assumptions, de forma que
       no admita interpretaciones distintas entre quien implemente y quien
-      valide? [Clarity, Spec §FR-003, §FR-004]
-- [ ] CHK007 - ¿Especifica la spec si "intentar acceder a una pantalla
+      valide? [Clarity, Spec §FR-003, §FR-004] → Resuelto: Assumptions ya
+      aclara que no hay token en cliente y qué significa exactamente
+      "limpiar" (borrar `rutaTrasAcceso`, forzar estado no autenticado).
+- [X] CHK007 - ¿Especifica la spec si "intentar acceder a una pantalla
       protegida" (FR-005) incluye solo el botón "atrás" del navegador o
       también la navegación directa a una URL/hash protegida escrita a
-      mano? [Ambiguity, Spec §FR-005]
+      mano? [Ambiguity, Spec §FR-005] → Resuelto: la redacción de FR-005
+      ("intentar acceder... —incluyendo mediante el botón atrás—") es una
+      cláusula general con el botón atrás solo como ejemplo incluido, por
+      lo que ya cubre cualquier intento de acceso, no solo ese caso.
 
 ## Requirement Consistency
 
-- [ ] CHK008 - ¿Usan FR-003 (éxito) y FR-004 (fallo) el mismo alcance y la
+- [X] CHK008 - ¿Usan FR-003 (éxito) y FR-004 (fallo) el mismo alcance y la
       misma terminología al describir "limpiar el estado local", de forma
       que no parezcan dos comportamientos distintos cuando en realidad
       deben coincidir salvo por el aviso? [Consistency, Spec §FR-003,
-      §FR-004]
-- [ ] CHK009 - ¿Es coherente la exigencia de evitar activaciones repetidas
+      §FR-004] → Resuelto: ambas usan literalmente "estado local
+      relacionado con la sesión" y "llevar... a la pantalla de acceso";
+      solo difieren en el aviso, como corresponde.
+- [X] CHK009 - ¿Es coherente la exigencia de evitar activaciones repetidas
       del control (FR-007) con el requisito de que el resultado final sea
       siempre el mismo (FR-003/FR-004), sin dejar un hueco donde una
       segunda pulsación durante la redirección pudiera producir un
-      resultado distinto? [Consistency, Spec §FR-007]
+      resultado distinto? [Consistency, Spec §FR-007] → Resuelto: FR-007
+      cubre explícitamente "mientras la acción... esté en curso", y el
+      edge case de doble clic en `spec.md` fija el mismo criterio.
 
 ## Acceptance Criteria Quality
 
-- [ ] CHK010 - ¿Es SC-002 ("el 100% de los intentos... terminan mostrando
+- [X] CHK010 - ¿Es SC-002 ("el 100% de los intentos... terminan mostrando
       la pantalla de acceso") verificable de forma objetiva sin más
       detalle sobre qué conjunto de pantallas protegidas se comprueba?
-      [Measurability, Spec §SC-002]
+      [Measurability, Spec §SC-002] → Resuelto: "pantalla protegida" ya es
+      un término consistente en toda la spec (todas salvo `/acceso`); no
+      hace falta enumerar cada una.
 - [ ] CHK011 - ¿Es SC-003 medible de forma objetiva en cuanto a qué cuenta
       como "aviso claro" (por ejemplo, criterios de legibilidad o
       visibilidad mínimos), o depende de una apreciación subjetiva?
-      [Measurability, Spec §SC-003]
+      [Measurability, Spec §SC-003] — Sigue abierto: "aviso claro" no
+      tiene un criterio objetivo más allá de "no bloqueante"; riesgo bajo,
+      se deja a criterio de `quickstart.md` (comprobación visual manual).
 
 ## Scenario Coverage
 
-- [ ] CHK012 - ¿Cubre la spec el escenario en que la freelancer no tiene
+- [X] CHK012 - ¿Cubre la spec el escenario en que la freelancer no tiene
       conexión de red en absoluto al pulsar "Cerrar sesión" (frente al
       escenario de que el backend responda con error), y confirma que el
-      resultado esperado es el mismo? [Coverage, Spec §Edge Cases]
-- [ ] CHK013 - ¿Se documenta el escenario en que la sesión ya se ha
+      resultado esperado es el mismo? [Coverage, Spec §Edge Cases] →
+      Resuelto: Edge Cases ya dice explícitamente que sin red el
+      resultado debe ser el mismo que el fallo del backend.
+- [X] CHK013 - ¿Se documenta el escenario en que la sesión ya se ha
       cerrado por otra vía (por ejemplo, otra pestaña) justo antes de que
-      esta pulsación de "Cerrar sesión" se complete? [Gap, Coverage]
+      esta pulsación de "Cerrar sesión" se complete? [Gap, Coverage] →
+      Resuelto: `spec.md` Assumptions, misma línea de CHK004 (cada
+      pestaña actúa sobre su propia cookie, sin sincronización).
 
 ## Edge Case Coverage
 
 - [ ] CHK014 - ¿Está definido el comportamiento esperado si la petición a
       `cerrarSesion()` queda pendiente durante mucho tiempo (por ejemplo,
       un servidor que no responde ni con éxito ni con error) en lugar de
-      fallar rápido? [Edge Case, Gap]
-- [ ] CHK015 - ¿Especifica la spec qué debe pasar con el propio control
+      fallar rápido? [Edge Case, Gap] — Sigue abierto: no hay ningún
+      requisito de timeout; riesgo bajo y aceptado por ahora.
+- [X] CHK015 - ¿Especifica la spec qué debe pasar con el propio control
       "Cerrar sesión" mientras la operación está en curso (por ejemplo, si
       debe reflejar visualmente que está en marcha) o solo exige que no se
-      disparen peticiones duplicadas? [Gap, Spec §FR-007]
+      disparen peticiones duplicadas? [Gap, Spec §FR-007] → Resuelto (por
+      omisión intencional): FR-007 solo exige evitar duplicados, sin pedir
+      feedback visual; es una decisión de alcance mínimo, no un olvido.
 
 ## Non-Functional Requirements (Seguridad)
 
 - [ ] CHK016 - ¿Se establece explícitamente que el cierre de sesión no
       debe dejar rastro de datos sensibles (por ejemplo, líneas de un
       presupuesto en edición) visibles tras la redirección a la pantalla
-      de acceso? [Gap]
-- [ ] CHK017 - ¿Es consistente el requisito de "no modificar el
+      de acceso? [Gap] — Sigue abierto: no está escrito explícitamente,
+      aunque la recarga completa ya lo garantiza en la práctica
+      (research.md §3); podría añadirse como Assumption si se considera
+      necesario.
+- [X] CHK017 - ¿Es consistente el requisito de "no modificar el
       comportamiento interno de `cerrarSesion()`" (Fuera de alcance) con
       la necesidad de que el cliente reaccione a sus posibles resultados
       (éxito/fallo) sin depender de detalles internos no documentados de
-      esa función? [Consistency, Spec §Fuera de alcance]
+      esa función? [Consistency, Spec §Fuera de alcance] → Resuelto:
+      FR-003/FR-004 solo dependen de si la promesa se resuelve o rechaza,
+      no de ningún detalle interno de `cerrarSesion()`.
 
 ## Dependencies & Assumptions
 
 - [ ] CHK018 - ¿Está validada, o al menos señalada como riesgo aceptado,
       la asunción de que no hace falta un diálogo de confirmación antes de
       cerrar sesión, considerando que la aplicación puede usarse en un
-      ordenador compartido? [Assumption, Spec §Assumptions]
-- [ ] CHK019 - ¿Documenta la spec su dependencia de que
+      ordenador compartido? [Assumption, Spec §Assumptions] — Sigue
+      abierto: la Assumption dice que no hace falta diálogo, pero no
+      discute explícitamente el riesgo del ordenador compartido; queda
+      como decisión de producto pendiente de confirmar con el usuario.
+- [X] CHK019 - ¿Documenta la spec su dependencia de que
       `POST /api/auth/logout` (spec 004) siga invalidando la cookie de
       sesión del lado servidor sin cambios, como condición necesaria para
       que FR-003/FR-004 sean ciertos? [Dependency, Spec §Fuera de alcance]
+      → Resuelto: "Fuera de alcance" ya prohíbe cambiar el comportamiento
+      interno de `cerrarSesion()`, y FR-002 exige reutilizarla tal cual,
+      dejando la dependencia implícita pero clara.
 
 ## Ambiguities & Conflicts
 
-- [ ] CHK020 - ¿Queda algún término sin resolver que pueda interpretarse
+- [X] CHK020 - ¿Queda algún término sin resolver que pueda interpretarse
       de más de una forma razonable en los requisitos de sesión y
       seguridad de esta spec (más allá de los ya señalados en este
-      checklist)? [Ambiguity]
+      checklist)? [Ambiguity] → Revisado: sí, quedan 5 puntos abiertos de
+      bajo riesgo (CHK001 cookie ya inválida, CHK011 "aviso claro" no
+      cuantificado, CHK014 sin timeout, CHK016 no dejar datos sensibles
+      visibles, CHK018 riesgo de ordenador compartido); ninguno bloquea
+      la implementación.
 
 ## Notes
 
