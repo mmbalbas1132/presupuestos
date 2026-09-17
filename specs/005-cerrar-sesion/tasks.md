@@ -36,7 +36,7 @@ exclusivamente frontend (`frontend/src/`, `frontend/tests/`). No se toca
 
 **Purpose**: preparación que no depende de la lógica del cierre de sesión
 
-- [ ] T001 [P] Ajustar `frontend/src/styles/base.css` para que un
+- [X] T001 [P] Ajustar `frontend/src/styles/base.css` para que un
       `<button>` dentro de `.nav` se vea y se comporte como los enlaces
       `.nav a` (mismo padding/tamaño en el layout normal y en el `@media
       (max-width: 480px)` ya existente), reutilizando las clases ya
@@ -52,7 +52,7 @@ usuario
 **⚠️ CRITICAL**: ninguna historia de usuario puede empezar hasta terminar
 esta fase
 
-- [ ] T002 [P] Crear `frontend/src/shared/cerrarSesionFlujo.js`
+- [X] T002 [P] Crear `frontend/src/shared/cerrarSesionFlujo.js`
       implementando `cerrarSesionFlujo({ cerrarSesion, limpiarEstadoLocal,
       navegarAAcceso })` según el contrato de `data-model.md`: intenta
       `await cerrarSesion()`; si lanza, lo captura y marca
@@ -67,7 +67,7 @@ esta fase
       (data-model.md), y en cualquier caso hace
       `window.location.hash = '#/acceso'` seguido de
       `window.location.reload()`.
-- [ ] T003 [P] Añadir el control "Cerrar sesión" a `crearNavegacion()` en
+- [X] T003 [P] Añadir el control "Cerrar sesión" a `crearNavegacion()` en
       `frontend/src/main.js`: un `<button>` con el texto visible "Cerrar
       sesión" dentro de la `<nav class="nav" id="app-nav">` ya existente
       (que ya se oculta en `/acceso` mediante `nav.hidden = ruta ===
@@ -93,7 +93,7 @@ vuelve a mostrar contenido protegido (quickstart.md, pasos 1-2).
 
 ### Tests for User Story 1 ⚠️
 
-- [ ] T004 [P] [US1] Test unitario del flujo feliz en
+- [X] T004 [P] [US1] Test unitario del flujo feliz en
       `frontend/tests/unit/shared/cerrarSesionFlujo.test.js`: con un
       `cerrarSesion` de prueba que resuelve, comprobar que
       `cerrarSesionFlujo()` llama a `limpiarEstadoLocal()` y a
@@ -102,12 +102,12 @@ vuelve a mostrar contenido protegido (quickstart.md, pasos 1-2).
 
 ### Implementation for User Story 1
 
-- [ ] T005 [US1] Conectar el control "Cerrar sesión" (T003) a
+- [X] T005 [US1] Conectar el control "Cerrar sesión" (T003) a
       `cerrarSesionFlujo()` (T002) en `frontend/src/main.js`: al pulsarlo,
       deshabilitar el botón inmediatamente (evita activaciones repetidas —
       FR-007, edge case de doble clic) e invocar `cerrarSesionFlujo()` con
       sus dependencias por defecto.
-- [ ] T006 [US1] Validar manualmente los pasos 1 y 2 de `quickstart.md`:
+- [X] T006 [US1] Validar manualmente los pasos 1 y 2 de `quickstart.md`:
       el control es visible y operable con teclado en Inicio, Presupuestos,
       Clientes, Catálogo y Perfil; al pulsarlo con el backend en marcha se
       llega a la pantalla de acceso; el botón "atrás" del navegador no
@@ -131,7 +131,7 @@ aviso no bloqueante (quickstart.md, paso 3).
 
 ### Tests for User Story 2 ⚠️
 
-- [ ] T007 [P] [US2] Test unitario del flujo de fallo en
+- [X] T007 [P] [US2] Test unitario del flujo de fallo en
       `frontend/tests/unit/shared/cerrarSesionFlujo.test.js`: con un
       `cerrarSesion` de prueba que rechaza, comprobar que
       `cerrarSesionFlujo()` llama igualmente a `limpiarEstadoLocal()` y a
@@ -140,14 +140,15 @@ aviso no bloqueante (quickstart.md, paso 3).
 
 ### Implementation for User Story 2
 
-- [ ] T008 [P] [US2] Leer y mostrar el aviso no bloqueante en
+- [X] T008 [P] [US2] Leer y mostrar el aviso no bloqueante en
       `frontend/src/ui/acceso/index.js`: al renderizar la pantalla, si
       existe la clave `avisoAcceso` en `sessionStorage`, mostrar su
-      contenido con la clase `.aviso-error` ya existente y borrar la clave
-      inmediatamente (mismo patrón defensivo que ya usa `rutaTrasAcceso`
-      en el mismo archivo), de forma que el aviso se vea una sola vez y no
-      bloquee el uso del formulario de acceso.
-- [ ] T009 [US2] Validar manualmente el paso 3 de `quickstart.md`: con el
+      contenido con la clase `.aviso-error` ya existente, sin bloquear el
+      uso del formulario de acceso. La lectura es no destructiva (la clave
+      se borra al iniciar el siguiente intento de acceso, no al montar la
+      pantalla) — ver research.md §5 para el porqué, descubierto durante
+      la verificación manual de T009.
+- [X] T009 [US2] Validar manualmente el paso 3 de `quickstart.md`: con el
       backend detenido, pulsar "Cerrar sesión" y comprobar que se llega a
       la pantalla de acceso con el aviso visible, que se puede seguir
       usando la pantalla de acceso con normalidad, y que al reiniciar el
@@ -162,16 +163,16 @@ independiente.
 
 **Purpose**: comprobaciones finales que afectan a ambas historias
 
-- [ ] T010 [P] Validar manualmente los pasos 4 y 5 de `quickstart.md`: el
+- [X] T010 [P] Validar manualmente los pasos 4 y 5 de `quickstart.md`: el
       control "Cerrar sesión" no aparece en la pantalla de acceso
       (FR-008); pulsarlo varias veces seguidas muy rápido no dispara
       cierres de sesión duplicados ni deja la aplicación en un estado
       inconsistente (FR-007).
-- [ ] T011 Ejecutar `cd frontend && npm test` y confirmar que
+- [X] T011 Ejecutar `cd frontend && npm test` y confirmar que
       `cerrarSesionFlujo.test.js` (T004, T007) pasa junto con el resto de
       la suite existente (dominio y `shared/`), sin haber roto ningún test
       previo.
-- [ ] T012 Revisar (`grep -rn "cerrarSesion" frontend/src`) que
+- [X] T012 Revisar (`grep -rn "cerrarSesion" frontend/src`) que
       `cerrarSesion()` de `frontend/src/api/auth.js` solo se invoca desde
       `frontend/src/shared/cerrarSesionFlujo.js`, confirmando que ya no
       queda como código muerto y que no se ha duplicado su lógica en

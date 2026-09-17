@@ -66,7 +66,8 @@ spec: flujo feliz (`huboError: false`) y fallo de `cerrarSesion()`
 | Clave | `avisoAcceso` |
 | Valor | Texto fijo del aviso no bloqueante (p. ej. `"No se ha podido cerrar sesión en el servidor, pero se ha cerrado en este dispositivo."`) |
 | Quién la escribe | `navegarAAcceso` por defecto, solo cuando `huboError` es `true`, justo antes de la recarga |
-| Quién la lee/borra | `ui/acceso/index.js`, al renderizar: si existe, la muestra con la clase `.aviso-error` ya existente y la borra inmediatamente (mismo patrón que `rutaTrasAcceso`) |
-| Ciclo de vida | Transitoria: una sola lectura la consume; nunca persiste entre sesiones ni se envía al servidor |
+| Quién la lee | `ui/acceso/index.js`, al renderizar: si existe, la muestra con la clase `.aviso-error` ya existente. La lectura es **no destructiva** (a diferencia de `rutaTrasAcceso`): el cambio de hash antes de la recarga completa dispara una re-renderización transitoria de `/acceso` en el documento saliente (vía el listener `hashchange` de `main.js`), que si borrase la clave al leerla dejaría vacía la recarga real posterior — se comprobó de forma reproducible en pruebas manuales. Por eso se lee sin borrar. |
+| Quién la borra | `ui/acceso/index.js`, dentro de `intentarAcceso()`, al iniciar un nuevo intento de acceso (mismo momento en que se limpia el mensaje de error anterior) |
+| Ciclo de vida | Transitoria: persiste en `sessionStorage` hasta el siguiente intento de acceso; nunca persiste entre sesiones del navegador ni se envía al servidor |
 
 No se introduce ninguna clave, tabla ni campo adicional más allá de esta.

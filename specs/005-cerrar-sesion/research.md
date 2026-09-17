@@ -103,3 +103,38 @@ evitar doble envío en un formulario; no requiere ninguna librería ni
 mecanismo de "debounce" adicional, y como el resultado final de
 `cerrarSesionFlujo()` es siempre una recarga completa de página, no hace
 falta volver a habilitar el botón en ningún caso de éxito ni de fallo.
+
+## 5. El aviso de fallo no puede leerse de forma destructiva al montar `/acceso`
+
+**Decisión**: `avisoPendiente()` en `ui/acceso/index.js` lee la clave
+`avisoAcceso` de `sessionStorage` **sin borrarla** en el momento de
+renderizar. Solo se borra más tarde, al iniciar un nuevo intento de acceso
+(`intentarAcceso()`), igual que ya se limpia el mensaje de error anterior
+ahí mismo.
+
+**Rationale**: cambiar `window.location.hash` a `#/acceso` antes de llamar
+a `window.location.reload()` dispara el listener `hashchange` ya existente
+en `main.js`, que vuelve a renderizar `/acceso` **en el documento
+saliente**, antes de que la recarga completa reemplace la página. Se
+comprobó de forma reproducible (instrumentando `sessionStorage` para
+trazar cada renderizado) que esta re-renderización transitoria ocurre
+siempre y, si `avisoPendiente()` borrara la clave al leerla (como sí hace
+`rutaTrasAcceso()`), la consumiría antes de que la recarga real llegara a
+mostrarla, dejando la pantalla final sin aviso. Al no borrar la clave al
+leerla, tanto el renderizado transitorio como el renderizado real posterior
+a la recarga muestran el mismo texto correctamente, sin duplicar lógica ni
+añadir un guard de navegación nuevo.
+
+**Por qué `rutaTrasAcceso()` no sufre el mismo problema**: se consume
+dentro de `intentarAcceso()` (al enviar el formulario), no durante el
+renderizado inicial de `/acceso`; el renderizado transitorio nunca la lee,
+así que no hay carrera posible para esa clave.
+
+**Alternatives considered**:
+- Añadir un guard/flag para suprimir la re-renderización transitoria antes
+  de recargar: rechazado por requerir tocar `main.js` y acoplar
+  `cerrarSesionFlujo.js` con el router de la aplicación para un problema
+  que se resuelve igual de bien cambiando cuándo se borra un único dato.
+- Usar `beforeunload` para borrar la clave: rechazado porque borraría el
+  aviso durante el propio renderizado transitorio (que también se
+  descarga), sin garantizar que sobreviva a la recarga real.

@@ -5,6 +5,7 @@ import { renderConfiguracion } from './ui/configuracion/index.js';
 import { renderInicio } from './ui/inicio/index.js';
 import { renderClientes } from './ui/clientes/index.js';
 import { renderAcceso } from './ui/acceso/index.js';
+import { cerrarSesionFlujo } from './shared/cerrarSesionFlujo.js';
 
 const rutas = new Map();
 let rutaPorDefecto = '/inicio';
@@ -54,6 +55,20 @@ async function renderizar() {
   await render(contenedor);
 }
 
+function crearBotonCerrarSesion() {
+  const boton = document.createElement('button');
+  boton.type = 'button';
+  boton.className = 'secundario';
+  boton.textContent = 'Cerrar sesión';
+
+  boton.addEventListener('click', () => {
+    boton.disabled = true;
+    cerrarSesionFlujo();
+  });
+
+  return boton;
+}
+
 function crearNavegacion() {
   const nav = document.createElement('nav');
   nav.className = 'nav';
@@ -65,6 +80,7 @@ function crearNavegacion() {
     <a href="#/catalogo">Catálogo</a>
     <a href="#/configuracion">Perfil</a>
   `;
+  nav.appendChild(crearBotonCerrarSesion());
   return nav;
 }
 

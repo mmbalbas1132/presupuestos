@@ -10,6 +10,22 @@ function rutaTrasAcceso() {
   }
 }
 
+function avisoPendiente() {
+  try {
+    return sessionStorage.getItem('avisoAcceso');
+  } catch {
+    return null;
+  }
+}
+
+function limpiarAvisoPendiente() {
+  try {
+    sessionStorage.removeItem('avisoAcceso');
+  } catch {
+    // Almacenamiento no disponible; no hay nada que limpiar.
+  }
+}
+
 export async function renderAcceso(contenedor) {
   contenedor.innerHTML = '';
 
@@ -28,6 +44,12 @@ export async function renderAcceso(contenedor) {
 
   const mensaje = document.createElement('div');
 
+  const aviso = avisoPendiente();
+  if (aviso) {
+    mensaje.className = 'aviso-error';
+    mensaje.textContent = aviso;
+  }
+
   const boton = document.createElement('button');
   boton.textContent = 'Entrar';
 
@@ -38,6 +60,7 @@ export async function renderAcceso(contenedor) {
     boton.disabled = true;
     mensaje.className = '';
     mensaje.textContent = '';
+    limpiarAvisoPendiente();
 
     try {
       await iniciarSesion(clave);

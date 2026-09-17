@@ -7,7 +7,7 @@ App web para que una freelancer cree presupuestos con cálculo automático de IV
 - Frontend: SPA en `frontend/src/` sin framework, servida con **Vite**; PDF con **jsPDF** (`frontend/src/pdf/`); estilos CSS puro con custom properties en `frontend/src/styles/base.css` (sin frameworks CSS).
 - Backend: **Express** + **better-sqlite3** (`backend/src/`), API HTTP mínima, solo persistencia (cálculos y PDF viven en el navegador).
 - Cero dependencias nuevas salvo necesidad real y justificada.
-- Estado actual: specs 001 (app base), 002 (rediseño visual + página de inicio) y 004 (seguridad y hardening) implementadas.
+- Estado actual: specs 001 (app base), 002 (rediseño visual + página de inicio), 004 (seguridad y hardening) y 005 (cerrar sesión) implementadas.
 
 ## Arrancar y probar en local
 ```bash
@@ -36,6 +36,7 @@ npm run build                                 # build de producción
 - [004] El registro de auditoría (`security.log`) vive en un fichero de líneas JSON en el servidor (`backend/src/auditoria.js`), sin tabla nueva en SQLite ni pantalla propia en la app; se purga solo a los 90 días.
 - [004] El límite de intentos fallidos de acceso vive en memoria del proceso backend (`backend/src/rateLimit.js`), sin Redis ni almacén compartido: es coherente con el despliegue de un único servidor.
 - [004] Ningún middleware de seguridad (auth, CORS, HTTPS, límite de intentos) usa una dependencia npm nueva; todos se apoyan en `node:crypto`/`node:fs` y en las capacidades ya nativas de Express (`res.cookie`), leyendo las cookies de petición manualmente para no depender de `cookie-parser`.
+- [005] El patrón `window.location.hash = '#/ruta'; window.location.reload()` (usado para ir a `/acceso`) dispara antes el listener `hashchange` de `main.js`, que re-renderiza esa ruta una vez en el documento saliente, antes de que la recarga real la reemplace: cualquier dato de `sessionStorage` que una pantalla lea y borre en el mismo momento de montarse se pierde en esa re-renderización transitoria y nunca llega a la recarga real. Por eso ese tipo de dato (p. ej. un aviso a mostrar tras la redirección) debe leerse sin borrar al montar, y borrarse en un momento posterior y explícito (como ya hace `rutaTrasAcceso`, que se consume al enviar el formulario, no al renderizar).
 
 
 ## Spec-kit

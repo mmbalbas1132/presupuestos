@@ -202,6 +202,13 @@ td {
   color: white;
 }
 
+.nav button.secundario {
+  margin-left: auto;
+  padding: var(--espacio-sm) var(--espacio);
+  font-size: var(--tam-texto-pequeno);
+  font-weight: 600;
+}
+
 @media (max-width: 480px) {
   .nav {
     gap: 0;
@@ -212,6 +219,12 @@ td {
     padding: var(--espacio-sm) var(--espacio-xs);
     flex: 1 1 auto;
     text-align: center;
+  }
+
+  .nav button.secundario {
+    margin-left: 0;
+    padding: var(--espacio-sm) var(--espacio-xs);
+    flex: 1 1 auto;
   }
 }
 
