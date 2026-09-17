@@ -51,5 +51,5 @@ Las reglas de producto viven en `.specify/memory/constitution.md` y el estado de
 <!-- SPECKIT START -->
 ## Feature en curso (Spec Kit)
 
-Plan activo: [specs/004-seguridad-hardening/plan.md](specs/004-seguridad-hardening/plan.md)
+Plan activo: [specs/005-cerrar-sesion/plan.md](specs/005-cerrar-sesion/plan.md)
 <!-- SPECKIT END -->
