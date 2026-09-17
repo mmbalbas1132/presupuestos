@@ -68,7 +68,7 @@ Como freelancer, quiero que al pulsar "Cerrar sesión" mi sesión termine en mi 
 - **SC-001**: Desde cualquier pantalla autenticada, la freelancer puede cerrar sesión y llegar a la pantalla de acceso con una única acción (un clic o toque).
 - **SC-002**: El 100% de los intentos de acceder a una pantalla protegida después de cerrar sesión —incluyendo mediante navegación "atrás" del navegador— terminan mostrando la pantalla de acceso, nunca contenido protegido.
 - **SC-003**: El 100% de los cierres de sesión en los que el servidor no responde terminan igualmente en la pantalla de acceso, con un aviso claro y no bloqueante, sin que la freelancer quede bloqueada o sin saber qué ha pasado.
-- **SC-004**: La freelancer puede localizar el control "Cerrar sesión" sin ayuda ni búsqueda adicional, independientemente de en qué pantalla autenticada se encuentre.
+- **SC-004**: El control "Cerrar sesión" es visible sin necesidad de hacer scroll ni de abrir ningún menú adicional, en el 100% de las pantallas autenticadas.
 
 ## Assumptions
 
@@ -77,3 +77,6 @@ Como freelancer, quiero que al pulsar "Cerrar sesión" mi sesión termine en mi 
 - Redirigir a la pantalla de acceso tras cerrar sesión puede apoyarse en el mismo patrón de recarga completa que ya usa la aplicación para llegar a `/acceso` (por ejemplo, tras un 401), ya que ese patrón garantiza que no queda estado en memoria de la sesión anterior.
 - No se requiere un diálogo de confirmación ("¿Seguro que quieres cerrar sesión?") antes de cerrar sesión; el cierre ocurre en una sola acción, en línea con SC-001.
 - "Aviso no bloqueante" significa un mensaje transitorio o descartable que no impide continuar usando la pantalla de acceso, no una alerta o modal que exija una acción para poder seguir.
+- El cierre de sesión voluntario no se registra en el fichero de auditoría (`security.log`, decisión [004]): ese registro se reserva para accesos rechazados y cambios de datos, no para acciones explícitas de la propia usuaria ya autenticada.
+- El aviso no bloqueante que se muestra cuando `cerrarSesion()` falla usa siempre un texto genérico fijo, sin incluir el mensaje de error técnico devuelto por el servidor o por la red (mismo criterio de no filtrar detalles técnicos ya aplicado en la spec 004).
+- Esta feature no sincroniza el cierre de sesión entre varias pestañas abiertas a la vez: cada pestaña actúa sobre su propia cookie de sesión, igual que ya ocurre hoy con el resto de la aplicación.

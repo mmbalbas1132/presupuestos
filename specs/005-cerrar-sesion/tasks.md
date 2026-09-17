@@ -111,7 +111,8 @@ vuelve a mostrar contenido protegido (quickstart.md, pasos 1-2).
       el control es visible y operable con teclado en Inicio, Presupuestos,
       Clientes, Catálogo y Perfil; al pulsarlo con el backend en marcha se
       llega a la pantalla de acceso; el botón "atrás" del navegador no
-      vuelve a mostrar la pantalla protegida anterior.
+      vuelve a mostrar la pantalla protegida anterior (FR-001, FR-003,
+      FR-005, FR-006, SC-001, SC-002, SC-004).
 
 **Checkpoint**: User Story 1 funciona de forma independiente y es el MVP
 de esta feature.
