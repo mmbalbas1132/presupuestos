@@ -1,5 +1,6 @@
 import { listarClientes, crearCliente } from '../../api/clientes.js';
 import { validarCliente } from '../../domain/validaciones.js';
+import { escapeHtml } from '../../shared/escapeHtml.js';
 
 const ETIQUETAS_TIPO = {
   particular: 'Particular',
@@ -119,8 +120,3 @@ function crearCampoTexto(etiqueta, id) {
   return campo;
 }
 
-function escapeHtml(texto) {
-  const div = document.createElement('div');
-  div.textContent = texto ?? '';
-  return div.innerHTML;
-}

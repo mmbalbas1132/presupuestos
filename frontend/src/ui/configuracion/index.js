@@ -43,9 +43,16 @@ export async function renderConfiguracion(contenedor) {
   const previsualizacion = document.createElement('div');
   previsualizacion.className = 'vista-previa';
   function actualizarPrevisualizacion() {
-    previsualizacion.innerHTML = logoDataUrl
-      ? `<img src="${logoDataUrl}" alt="Logo" class="logo-vista-previa">`
-      : '';
+    const esImagenValida = typeof logoDataUrl === 'string' && /^data:image\/[a-zA-Z0-9.+-]+;base64,/.test(logoDataUrl);
+    if (esImagenValida) {
+      const img = document.createElement('img');
+      img.src = logoDataUrl;
+      img.alt = 'Logo';
+      img.className = 'logo-vista-previa';
+      previsualizacion.replaceChildren(img);
+    } else {
+      previsualizacion.replaceChildren();
+    }
   }
   actualizarPrevisualizacion();
 

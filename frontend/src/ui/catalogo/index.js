@@ -1,5 +1,6 @@
 import { listarServicios, crearServicio, actualizarServicio, eliminarServicio } from '../../api/servicios.js';
 import { formatMoney } from '../../shared/formatMoney.js';
+import { escapeHtml } from '../../shared/escapeHtml.js';
 
 export async function renderCatalogo(contenedor) {
   contenedor.innerHTML = '<p>Cargando catálogo…</p>';
@@ -171,8 +172,3 @@ export async function renderCatalogo(contenedor) {
   dibujar();
 }
 
-function escapeHtml(texto) {
-  const div = document.createElement('div');
-  div.textContent = texto ?? '';
-  return div.innerHTML;
-}

@@ -2,6 +2,7 @@ import { listarPresupuestos, obtenerPresupuesto } from '../../api/presupuestos.j
 import { listarClientes, obtenerCliente } from '../../api/clientes.js';
 import { obtenerPerfil } from '../../api/perfil.js';
 import { formatMoney } from '../../shared/formatMoney.js';
+import { escapeHtml } from '../../shared/escapeHtml.js';
 import { descargarPdf } from '../../pdf/generarPdf.js';
 import { estadoVisual } from '../../shared/estadoPresupuesto.js';
 
@@ -95,8 +96,3 @@ export async function renderHistorial(contenedor) {
   contenedor.appendChild(tarjeta);
 }
 
-function escapeHtml(texto) {
-  const div = document.createElement('div');
-  div.textContent = texto ?? '';
-  return div.innerHTML;
-}

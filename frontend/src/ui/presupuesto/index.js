@@ -10,6 +10,7 @@ import { obtenerPerfil } from '../../api/perfil.js';
 import { calcularBaseImponible, calcularIVA, calcularRetencion, calcularTotal } from '../../domain/calculo.js';
 import { validarLinea, validarCliente } from '../../domain/validaciones.js';
 import { formatMoney } from '../../shared/formatMoney.js';
+import { escapeHtml } from '../../shared/escapeHtml.js';
 import { descargarPdf } from '../../pdf/generarPdf.js';
 
 let contadorLineaLocal = 0;
@@ -576,8 +577,3 @@ export async function renderPresupuesto(contenedor) {
   dibujar();
 }
 
-function escapeHtml(texto) {
-  const div = document.createElement('div');
-  div.textContent = texto ?? '';
-  return div.innerHTML;
-}

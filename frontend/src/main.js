@@ -4,6 +4,7 @@ import { renderCatalogo } from './ui/catalogo/index.js';
 import { renderConfiguracion } from './ui/configuracion/index.js';
 import { renderInicio } from './ui/inicio/index.js';
 import { renderClientes } from './ui/clientes/index.js';
+import { renderAcceso } from './ui/acceso/index.js';
 
 const rutas = new Map();
 let rutaPorDefecto = '/inicio';
@@ -38,6 +39,7 @@ async function renderizar() {
 
   const nav = document.getElementById('app-nav');
   if (nav) {
+    nav.hidden = ruta === '/acceso';
     actualizarNavActiva(ruta);
   }
 
@@ -84,5 +86,6 @@ registrarRuta('/catalogo', renderCatalogo);
 registrarRuta('/configuracion', renderConfiguracion);
 registrarRuta('/inicio', renderInicio);
 registrarRuta('/clientes', renderClientes);
+registrarRuta('/acceso', renderAcceso);
 
 iniciarApp();
