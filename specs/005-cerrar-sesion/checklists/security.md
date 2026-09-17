@@ -14,10 +14,12 @@ seguridad.
 
 ## Requirement Completeness
 
-- [ ] CHK001 - ¿Está definido qué debe ocurrir si la cookie de sesión ya
+- [X] CHK001 - ¿Está definido qué debe ocurrir si la cookie de sesión ya
       ha caducado o es inválida en el servidor en el momento en que la
       freelancer pulsa "Cerrar sesión" (por ejemplo, tras haber estado
-      inactiva)? [Gap]
+      inactiva)? [Gap] → Resuelto: `spec.md` Assumptions, nueva línea
+      "Si la cookie de sesión ya era inválida... el resultado es el mismo
+      que el flujo feliz (FR-003)".
 - [X] CHK002 - ¿Especifica la spec si el cierre de sesión voluntario debe
       quedar reflejado en el registro de auditoría (`security.log`,
       decisión [004] de `CLAUDE.md`), o si eso queda explícitamente fuera
@@ -84,12 +86,13 @@ seguridad.
       [Measurability, Spec §SC-002] → Resuelto: "pantalla protegida" ya es
       un término consistente en toda la spec (todas salvo `/acceso`); no
       hace falta enumerar cada una.
-- [ ] CHK011 - ¿Es SC-003 medible de forma objetiva en cuanto a qué cuenta
+- [X] CHK011 - ¿Es SC-003 medible de forma objetiva en cuanto a qué cuenta
       como "aviso claro" (por ejemplo, criterios de legibilidad o
       visibilidad mínimos), o depende de una apreciación subjetiva?
-      [Measurability, Spec §SC-003] — Sigue abierto: "aviso claro" no
-      tiene un criterio objetivo más allá de "no bloqueante"; riesgo bajo,
-      se deja a criterio de `quickstart.md` (comprobación visual manual).
+      [Measurability, Spec §SC-003] → Resuelto: SC-003 ahora exige
+      reutilizar el mismo estilo visual (color, contraste, tamaño) que ya
+      usa la aplicación para errores, en lugar del término subjetivo
+      "claro".
 
 ## Scenario Coverage
 
@@ -107,11 +110,13 @@ seguridad.
 
 ## Edge Case Coverage
 
-- [ ] CHK014 - ¿Está definido el comportamiento esperado si la petición a
+- [X] CHK014 - ¿Está definido el comportamiento esperado si la petición a
       `cerrarSesion()` queda pendiente durante mucho tiempo (por ejemplo,
       un servidor que no responde ni con éxito ni con error) en lugar de
-      fallar rápido? [Edge Case, Gap] — Sigue abierto: no hay ningún
-      requisito de timeout; riesgo bajo y aceptado por ahora.
+      fallar rápido? [Edge Case, Gap] → Resuelto (por decisión explícita):
+      `spec.md` Assumptions ahora dice que no se añade un temporizador
+      propio, confiando en los límites de tiempo por defecto del
+      navegador, en línea con el Principio de simplicidad.
 - [X] CHK015 - ¿Especifica la spec qué debe pasar con el propio control
       "Cerrar sesión" mientras la operación está en curso (por ejemplo, si
       debe reflejar visualmente que está en marcha) o solo exige que no se
@@ -121,13 +126,13 @@ seguridad.
 
 ## Non-Functional Requirements (Seguridad)
 
-- [ ] CHK016 - ¿Se establece explícitamente que el cierre de sesión no
+- [X] CHK016 - ¿Se establece explícitamente que el cierre de sesión no
       debe dejar rastro de datos sensibles (por ejemplo, líneas de un
       presupuesto en edición) visibles tras la redirección a la pantalla
-      de acceso? [Gap] — Sigue abierto: no está escrito explícitamente,
-      aunque la recarga completa ya lo garantiza en la práctica
-      (research.md §3); podría añadirse como Assumption si se considera
-      necesario.
+      de acceso? [Gap] → Resuelto: `spec.md` Assumptions, nueva línea
+      "La redirección... siempre implica una recarga completa de la
+      página... por lo que ningún dato de una pantalla protegida
+      permanece visible tras cerrar sesión".
 - [X] CHK017 - ¿Es consistente el requisito de "no modificar el
       comportamiento interno de `cerrarSesion()`" (Fuera de alcance) con
       la necesidad de que el cliente reaccione a sus posibles resultados
@@ -138,13 +143,13 @@ seguridad.
 
 ## Dependencies & Assumptions
 
-- [ ] CHK018 - ¿Está validada, o al menos señalada como riesgo aceptado,
+- [X] CHK018 - ¿Está validada, o al menos señalada como riesgo aceptado,
       la asunción de que no hace falta un diálogo de confirmación antes de
       cerrar sesión, considerando que la aplicación puede usarse en un
-      ordenador compartido? [Assumption, Spec §Assumptions] — Sigue
-      abierto: la Assumption dice que no hace falta diálogo, pero no
-      discute explícitamente el riesgo del ordenador compartido; queda
-      como decisión de producto pendiente de confirmar con el usuario.
+      ordenador compartido? [Assumption, Spec §Assumptions] → Resuelto:
+      la Assumption ahora explica el porqué (acción de bajo riesgo y
+      reversible, se prioriza la rapidez de SC-001 sobre la fricción de
+      una confirmación), en lugar de solo declarar la decisión.
 - [X] CHK019 - ¿Documenta la spec su dependencia de que
       `POST /api/auth/logout` (spec 004) siga invalidando la cookie de
       sesión del lado servidor sin cambios, como condición necesaria para
@@ -158,11 +163,10 @@ seguridad.
 - [X] CHK020 - ¿Queda algún término sin resolver que pueda interpretarse
       de más de una forma razonable en los requisitos de sesión y
       seguridad de esta spec (más allá de los ya señalados en este
-      checklist)? [Ambiguity] → Revisado: sí, quedan 5 puntos abiertos de
-      bajo riesgo (CHK001 cookie ya inválida, CHK011 "aviso claro" no
-      cuantificado, CHK014 sin timeout, CHK016 no dejar datos sensibles
-      visibles, CHK018 riesgo de ordenador compartido); ninguno bloquea
-      la implementación.
+      checklist)? [Ambiguity] → Revisado: no quedan puntos abiertos. Los 5
+      que seguían pendientes (CHK001, CHK011, CHK014, CHK016, CHK018) se
+      cerraron con nuevas líneas en `spec.md` Assumptions y una
+      reformulación de SC-003.
 
 ## Notes
 
