@@ -1,4 +1,6 @@
 import { Router } from 'express';
+import { validarNif, validarLongitudMaxima } from '../validacion.js';
+import { registrarEvento } from '../auditoria.js';
 
 export const clientesRouter = Router();
 
@@ -28,12 +30,19 @@ clientesRouter.post('/', (req, res, next) => {
   if (!nombre || !nif || !tipo) {
     return next(errorApi(400, 'Faltan campos obligatorios: nombre, nif y tipo.'));
   }
+  if (!validarLongitudMaxima(nombre, 200)) {
+    return next(errorApi(400, 'El nombre no es válido (máximo 200 caracteres).'));
+  }
+  if (!validarNif(nif)) {
+    return next(errorApi(400, 'El NIF no tiene un formato válido.'));
+  }
 
   const resultado = req.db
     .prepare('INSERT INTO clientes (nombre, nif, tipo) VALUES (?, ?, ?)')
     .run(nombre, nif, tipo);
 
   const cliente = req.db.prepare('SELECT * FROM clientes WHERE id = ?').get(resultado.lastInsertRowid);
+  registrarEvento('cambio_dato', `Cliente creado: id=${cliente.id}`, req.ip);
   res.status(201).json(mapCliente(cliente));
 });
 

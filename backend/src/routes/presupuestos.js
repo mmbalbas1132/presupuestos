@@ -1,4 +1,6 @@
 import { Router } from 'express';
+import { validarLongitudMaxima } from '../validacion.js';
+import { registrarEvento } from '../auditoria.js';
 
 export const presupuestosRouter = Router();
 
@@ -94,6 +96,10 @@ presupuestosRouter.put('/:id/borrador', (req, res, next) => {
   if (!clienteId) {
     return next(errorApi(400, 'Falta el cliente del presupuesto.'));
   }
+  const lineaInvalida = lineas.find((linea) => !validarLongitudMaxima(linea.descripcion, 500));
+  if (lineaInvalida) {
+    return next(errorApi(400, 'La descripción de una línea no es válida (máximo 500 caracteres).'));
+  }
 
   const db = req.db;
   const esNuevo = req.params.id === 'nuevo';
@@ -145,6 +151,7 @@ presupuestosRouter.put('/:id/borrador', (req, res, next) => {
     return next(err.status ? err : errorApi(500, err.message));
   }
 
+  registrarEvento('cambio_dato', `Presupuesto guardado (borrador): id=${presupuestoId}`, req.ip);
   const fila = db.prepare('SELECT * FROM presupuestos WHERE id = ?').get(presupuestoId);
   res.json(mapPresupuesto(db, fila));
 });
@@ -198,6 +205,7 @@ presupuestosRouter.post('/:id/emitir', (req, res, next) => {
 
   transaccion();
 
+  registrarEvento('cambio_dato', `Presupuesto emitido: id=${req.params.id}, numero=${numero}`, req.ip);
   const fila = db.prepare('SELECT * FROM presupuestos WHERE id = ?').get(req.params.id);
   res.json(mapPresupuesto(db, fila));
 });

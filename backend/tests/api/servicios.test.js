@@ -1,22 +1,15 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import request from 'supertest';
-import { createApp } from '../../src/server.js';
-import { createConnection } from '../../src/db/connection.js';
-
-function crearAppDePrueba() {
-  const db = createConnection(':memory:');
-  return createApp(db);
-}
+import { crearAppAutenticada } from '../helpers/appAutenticada.js';
 
 describe('API servicios', () => {
-  let app;
+  let agent;
 
-  beforeEach(() => {
-    app = crearAppDePrueba();
+  beforeEach(async () => {
+    ({ agent } = await crearAppAutenticada());
   });
 
   it('crea un servicio', async () => {
-    const respuesta = await request(app)
+    const respuesta = await agent
       .post('/api/servicios')
       .send({ nombre: 'Diseño de logotipo', precioHabitual: 450 });
 
@@ -25,30 +18,30 @@ describe('API servicios', () => {
   });
 
   it('rechaza crear un servicio sin nombre', async () => {
-    const respuesta = await request(app).post('/api/servicios').send({ precioHabitual: 450 });
+    const respuesta = await agent.post('/api/servicios').send({ precioHabitual: 450 });
     expect(respuesta.status).toBe(400);
   });
 
   it('rechaza crear un servicio con precio negativo', async () => {
-    const respuesta = await request(app)
+    const respuesta = await agent
       .post('/api/servicios')
       .send({ nombre: 'Servicio', precioHabitual: -10 });
     expect(respuesta.status).toBe(400);
   });
 
   it('lista los servicios del catálogo', async () => {
-    await request(app).post('/api/servicios').send({ nombre: 'A', precioHabitual: 10 });
-    await request(app).post('/api/servicios').send({ nombre: 'B', precioHabitual: 20 });
+    await agent.post('/api/servicios').send({ nombre: 'A', precioHabitual: 10 });
+    await agent.post('/api/servicios').send({ nombre: 'B', precioHabitual: 20 });
 
-    const respuesta = await request(app).get('/api/servicios');
+    const respuesta = await agent.get('/api/servicios');
     expect(respuesta.status).toBe(200);
     expect(respuesta.body).toHaveLength(2);
   });
 
   it('edita un servicio existente', async () => {
-    const creado = await request(app).post('/api/servicios').send({ nombre: 'A', precioHabitual: 10 });
+    const creado = await agent.post('/api/servicios').send({ nombre: 'A', precioHabitual: 10 });
 
-    const editado = await request(app)
+    const editado = await agent
       .put(`/api/servicios/${creado.body.id}`)
       .send({ nombre: 'A editado', precioHabitual: 15 });
 
@@ -58,12 +51,12 @@ describe('API servicios', () => {
   });
 
   it('elimina un servicio', async () => {
-    const creado = await request(app).post('/api/servicios').send({ nombre: 'A', precioHabitual: 10 });
+    const creado = await agent.post('/api/servicios').send({ nombre: 'A', precioHabitual: 10 });
 
-    const eliminado = await request(app).delete(`/api/servicios/${creado.body.id}`);
+    const eliminado = await agent.delete(`/api/servicios/${creado.body.id}`);
     expect(eliminado.status).toBe(204);
 
-    const listado = await request(app).get('/api/servicios');
+    const listado = await agent.get('/api/servicios');
     expect(listado.body).toHaveLength(0);
   });
 });

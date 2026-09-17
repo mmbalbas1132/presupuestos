@@ -1,29 +1,22 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import request from 'supertest';
-import { createApp } from '../../src/server.js';
-import { createConnection } from '../../src/db/connection.js';
+import { crearAppAutenticada } from '../helpers/appAutenticada.js';
 
-function crearAppDePrueba() {
-  const db = createConnection(':memory:');
-  return createApp(db);
-}
-
-async function crearCliente(app, datos = { nombre: 'Empresa XYZ', nif: 'B12345678', tipo: 'empresa' }) {
-  const respuesta = await request(app).post('/api/clientes').send(datos);
+async function crearCliente(agent, datos = { nombre: 'Empresa XYZ', nif: 'B12345678', tipo: 'empresa' }) {
+  const respuesta = await agent.post('/api/clientes').send(datos);
   return respuesta.body.id;
 }
 
 describe('API presupuestos', () => {
-  let app;
+  let agent;
 
-  beforeEach(() => {
-    app = crearAppDePrueba();
+  beforeEach(async () => {
+    ({ agent } = await crearAppAutenticada());
   });
 
   it('guarda un borrador nuevo con líneas', async () => {
-    const clienteId = await crearCliente(app);
+    const clienteId = await crearCliente(agent);
 
-    const respuesta = await request(app)
+    const respuesta = await agent
       .put('/api/presupuestos/nuevo/borrador')
       .send({
         clienteId,
@@ -43,12 +36,12 @@ describe('API presupuestos', () => {
   });
 
   it('actualiza un borrador existente', async () => {
-    const clienteId = await crearCliente(app);
-    const creado = await request(app)
+    const clienteId = await crearCliente(agent);
+    const creado = await agent
       .put('/api/presupuestos/nuevo/borrador')
       .send({ clienteId, lineas: [], baseImponible: 0, iva: 0, retencionImporte: 0, total: 0 });
 
-    const actualizado = await request(app)
+    const actualizado = await agent
       .put(`/api/presupuestos/${creado.body.id}/borrador`)
       .send({
         clienteId,
@@ -65,15 +58,30 @@ describe('API presupuestos', () => {
   });
 
   it('rechaza un borrador sin cliente', async () => {
-    const respuesta = await request(app)
+    const respuesta = await agent
       .put('/api/presupuestos/nuevo/borrador')
       .send({ lineas: [] });
     expect(respuesta.status).toBe(400);
   });
 
+  it('rechaza una línea con una descripción demasiado larga', async () => {
+    const clienteId = await crearCliente(agent);
+    const respuesta = await agent
+      .put('/api/presupuestos/nuevo/borrador')
+      .send({
+        clienteId,
+        lineas: [{ origen: 'manual', descripcion: 'x'.repeat(501), cantidad: 1, precioUnitario: 1 }],
+        baseImponible: 1,
+        iva: 0,
+        retencionImporte: 0,
+        total: 1,
+      });
+    expect(respuesta.status).toBe(400);
+  });
+
   it('emite un presupuesto con número único', async () => {
-    const clienteId = await crearCliente(app);
-    const creado = await request(app)
+    const clienteId = await crearCliente(agent);
+    const creado = await agent
       .put('/api/presupuestos/nuevo/borrador')
       .send({
         clienteId,
@@ -84,7 +92,7 @@ describe('API presupuestos', () => {
         total: 477,
       });
 
-    const emitido = await request(app)
+    const emitido = await agent
       .post(`/api/presupuestos/${creado.body.id}/emitir`)
       .send({ numero: '2026-001', fechaEmision: '2026-09-15' });
 
@@ -94,12 +102,12 @@ describe('API presupuestos', () => {
   });
 
   it('rechaza emitir un presupuesto sin líneas', async () => {
-    const clienteId = await crearCliente(app);
-    const creado = await request(app)
+    const clienteId = await crearCliente(agent);
+    const creado = await agent
       .put('/api/presupuestos/nuevo/borrador')
       .send({ clienteId, lineas: [], baseImponible: 0, iva: 0, retencionImporte: 0, total: 0 });
 
-    const emitido = await request(app)
+    const emitido = await agent
       .post(`/api/presupuestos/${creado.body.id}/emitir`)
       .send({ numero: '2026-001', fechaEmision: '2026-09-15' });
 
@@ -107,8 +115,8 @@ describe('API presupuestos', () => {
   });
 
   it('rechaza editar un presupuesto ya emitido', async () => {
-    const clienteId = await crearCliente(app);
-    const creado = await request(app)
+    const clienteId = await crearCliente(agent);
+    const creado = await agent
       .put('/api/presupuestos/nuevo/borrador')
       .send({
         clienteId,
@@ -119,11 +127,11 @@ describe('API presupuestos', () => {
         total: 477,
       });
 
-    await request(app)
+    await agent
       .post(`/api/presupuestos/${creado.body.id}/emitir`)
       .send({ numero: '2026-001', fechaEmision: '2026-09-15' });
 
-    const reintento = await request(app)
+    const reintento = await agent
       .put(`/api/presupuestos/${creado.body.id}/borrador`)
       .send({ clienteId, lineas: [], baseImponible: 0, iva: 0, retencionImporte: 0, total: 0 });
 
@@ -131,8 +139,8 @@ describe('API presupuestos', () => {
   });
 
   it('rechaza reemitir un presupuesto ya emitido', async () => {
-    const clienteId = await crearCliente(app);
-    const creado = await request(app)
+    const clienteId = await crearCliente(agent);
+    const creado = await agent
       .put('/api/presupuestos/nuevo/borrador')
       .send({
         clienteId,
@@ -143,11 +151,11 @@ describe('API presupuestos', () => {
         total: 477,
       });
 
-    await request(app)
+    await agent
       .post(`/api/presupuestos/${creado.body.id}/emitir`)
       .send({ numero: '2026-001', fechaEmision: '2026-09-15' });
 
-    const segundaEmision = await request(app)
+    const segundaEmision = await agent
       .post(`/api/presupuestos/${creado.body.id}/emitir`)
       .send({ numero: '2026-002', fechaEmision: '2026-09-15' });
 
@@ -155,9 +163,9 @@ describe('API presupuestos', () => {
   });
 
   it('rechaza un número de presupuesto duplicado (red de seguridad UNIQUE)', async () => {
-    const clienteId = await crearCliente(app);
+    const clienteId = await crearCliente(agent);
 
-    const primero = await request(app)
+    const primero = await agent
       .put('/api/presupuestos/nuevo/borrador')
       .send({
         clienteId,
@@ -167,11 +175,11 @@ describe('API presupuestos', () => {
         retencionImporte: 67.5,
         total: 477,
       });
-    await request(app)
+    await agent
       .post(`/api/presupuestos/${primero.body.id}/emitir`)
       .send({ numero: '2026-001', fechaEmision: '2026-09-15' });
 
-    const segundo = await request(app)
+    const segundo = await agent
       .put('/api/presupuestos/nuevo/borrador')
       .send({
         clienteId,
@@ -182,7 +190,7 @@ describe('API presupuestos', () => {
         total: 106,
       });
 
-    const emitidoDuplicado = await request(app)
+    const emitidoDuplicado = await agent
       .post(`/api/presupuestos/${segundo.body.id}/emitir`)
       .send({ numero: '2026-001', fechaEmision: '2026-09-15' });
 
@@ -190,29 +198,29 @@ describe('API presupuestos', () => {
   });
 
   it('devuelve el borrador activo para retomarlo', async () => {
-    const clienteId = await crearCliente(app);
-    const creado = await request(app)
+    const clienteId = await crearCliente(agent);
+    const creado = await agent
       .put('/api/presupuestos/nuevo/borrador')
       .send({ clienteId, lineas: [], baseImponible: 0, iva: 0, retencionImporte: 0, total: 0 });
 
-    const activo = await request(app).get('/api/presupuestos/borrador-activo');
+    const activo = await agent.get('/api/presupuestos/borrador-activo');
     expect(activo.status).toBe(200);
     expect(activo.body.id).toBe(creado.body.id);
   });
 
   it('devuelve null si no hay borrador activo', async () => {
-    const respuesta = await request(app).get('/api/presupuestos/borrador-activo');
+    const respuesta = await agent.get('/api/presupuestos/borrador-activo');
     expect(respuesta.status).toBe(200);
     expect(respuesta.body).toBeNull();
   });
 
   it('lista el historial completo incluyendo borradores y emitidos', async () => {
-    const clienteId = await crearCliente(app);
-    await request(app)
+    const clienteId = await crearCliente(agent);
+    await agent
       .put('/api/presupuestos/nuevo/borrador')
       .send({ clienteId, lineas: [], baseImponible: 0, iva: 0, retencionImporte: 0, total: 0 });
 
-    const respuesta = await request(app).get('/api/presupuestos');
+    const respuesta = await agent.get('/api/presupuestos');
     expect(respuesta.status).toBe(200);
     expect(respuesta.body).toHaveLength(1);
   });

@@ -1,4 +1,6 @@
 import { Router } from 'express';
+import { validarNif, validarLongitudMaxima, validarContacto, validarLogoDataUrl } from '../validacion.js';
+import { registrarEvento } from '../auditoria.js';
 
 export const perfilRouter = Router();
 
@@ -30,6 +32,18 @@ perfilRouter.put('/', (req, res, next) => {
   if (!nombre || !nif || !contacto) {
     return next(errorApi(400, 'Faltan campos obligatorios: nombre, nif y contacto.'));
   }
+  if (!validarLongitudMaxima(nombre, 200)) {
+    return next(errorApi(400, 'El nombre no es válido (máximo 200 caracteres).'));
+  }
+  if (!validarNif(nif)) {
+    return next(errorApi(400, 'El NIF no tiene un formato válido.'));
+  }
+  if (!validarContacto(contacto)) {
+    return next(errorApi(400, 'El contacto debe parecer un email o un teléfono.'));
+  }
+  if (!validarLogoDataUrl(logo)) {
+    return next(errorApi(400, 'El logo no tiene un formato de imagen válido.'));
+  }
 
   req.db
     .prepare(
@@ -39,6 +53,7 @@ perfilRouter.put('/', (req, res, next) => {
     )
     .run(nombre, nif, contacto, logo);
 
+  registrarEvento('cambio_dato', 'Perfil actualizado', req.ip);
   const fila = req.db.prepare('SELECT * FROM perfil_freelancer WHERE id = 1').get();
   res.json(mapPerfil(fila));
 });
